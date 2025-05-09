@@ -1,0 +1,25 @@
+import express from "express";
+import bodyParser from "body-parser";
+import ciudadesRutas from "./src/rutas/ciudadesRutas.js";
+import dotenv from "dotenv";
+// import generosRutas from "./rutas/generosRutas.js";
+// import lenguajesRutas from "./rutas/lenguajesRutas.js";
+// import usuariosRutas from "./rutas/usuariosRutas.js";
+// import lenguajeUsuariosRutas from "./rutas/lenguajesUsuariosRutas.js";
+dotenv.config();
+export const app = express();
+
+app.use(bodyParser.json());
+
+app.use(express.urlencoded({ "extended": true }))
+
+
+app.use("/ciudades", ciudadesRutas);
+// app.use("/generos", generosRutas)
+// app.use("/lenguajes", lenguajesRutas)
+// app.use("/usuarios", usuariosRutas)
+// app.use("/lenguajeUsuarios", lenguajeUsuariosRutas)
+const port = process.env.PORT || 3000;
+app.listen(port, () => {
+  console.log("holii");
+});
