@@ -10,9 +10,27 @@ class Lenguajes {
       throw new Error("error al obtener los lenguajes");
     }
   }
+  async getById(id) {
+    try {
+      const [rows] = await connection.query("SELECT * FROM lenguajes WHERE lenguaje_id = ?", [id]);
+      if (rows.length === 0) {
+        return []
+      }
+      return rows[0];
+    } catch (error) {
+      throw new Error("error al obtener el lenguaje");
+    }
+  }
+  async LenguajeUsuarios(id) {
+    const [rows] = await connection.query("SELECT * FROM lenguajes_usuarios WHERE id_lenguaje  = ?", [id]);
+    return rows;
+  }
   async create(lenguaje) {
     try {
       const [result] = await connection.query("INSERT INTO lenguajes (lenguaje) VALUES (?)", [lenguaje]);
+      if(result.affectedRows === 0){
+        return null;
+      }
       return {
         id: result.id, lenguaje
       }
@@ -20,41 +38,36 @@ class Lenguajes {
       throw new Error("error al crear el lenguaje");
     }
   }
-  async update(lenguaje, id) {
+  async update(id,campos) {
     try {
-      const [result] = await connection.query("UPDATE lenguajes SET lenguaje = ? WHERE lenguaje_id = ?", [lenguaje, id]);
-      if (result.affectedRows === 0) {
-        throw new Error("lenguaje no encontrada");
+      let query = "UPDATE lenguajes SET ";
+      let params = [];
+      for(const [key, value] of Object.entries(campos)){
+        query+= `${key} = ?, `;
+        params.push(value);
       }
-      return { id, lenguaje }
+      query = query.slice(0, -2);
+      query += "WHERE lenguaje_id = ? ";
+      params.push(id);
+      const [result] = await connection.query(query,params);
+      return result.affectedRows > 0? { id, ...campos}: null;
     } catch (error) {
-
+      throw new Error("Error al actualizar el lenguaje");
     }
-  }
-  async updateParcial(id,campos) {
-    for (const propiedad in campos) {
-      const [result] = await connection.query(`UPDATE lenguajes SET ${propiedad} = ? WHERE lenguaje_id = ?`, [campos[propiedad], id]);
-    }
-    const [rows] = await connection.query("SELECT * FROM lenguajes WHERE lenguaje_id = ?", [id]);
-    return rows;
-  }
-
-  async validarLenguaje (id_lenguaje) {
-    const [rows] = await connection.query("SELECT * FROM lenguajes_usuarios WHERE id_lenguaje  = ?",[id_lenguaje]);
-    return rows.length>0;
   }
   async eliminar (id){
-    try {
-      if(await this.validarLenguaje (id)){
-        throw new Error("no se puede eliminar el lenguaje porque tiene usuarios asociados");
-      } 
-      const [result] = await connection.query("DELETE FROM lenguajes WHERE lenguaje_id = ?", [id]);
-      return result;
-    } catch (error) {
-      throw new Error(error);
+    const [result] = await connection.query("DELETE FROM lenguajes WHERE lenguaje_id = ?", [id]);
+    if(result.affectedRows === 0){
+        return{
+          error: true,
+          message: "No se pudo eliminar el lenguaje, ocurrio un error inesperado.",
+        }
+    }
+    return{
+      error: false,
+      message: "Lenguaje eliminada exitosamente.",
     }
   }
-  
 }
 
 export default Lenguajes;

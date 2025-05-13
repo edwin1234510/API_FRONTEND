@@ -36,38 +36,34 @@ class Ciudades {
       throw new Error("error al crear la ciudad");
     }
   }
-  async update(ciudad_nombre, id) {
+  async update(id,campos) {
     try {
-      const [result] = await connection.query("UPDATE ciudades SET ciudad_nombre = ? WHERE ciudad_id = ?", [ciudad_nombre, id]);
-      if (result.affectedRows === 0) {
-        throw new Error("ciudad no encontrada");
+      let query = "UPDATE ciudades SET ";
+      let params = [];
+      for(const [key, value] of Object.entries(campos)){
+        query+= `${key} = ?, `;
+        params.push(value);
       }
-      return { id, ciudad_nombre }
+      query = query.slice(0, -2);
+      query += "WHERE ciudad_id = ? ";
+      params.push(id);
+      const [result] = await connection.query(query,params);
+      return result.affectedRows > 0? { id, ...campos}: null;
     } catch (error) {
-
+      throw new Error("Error al actualizar la ciuadad");
     }
-  }
-  async updateParcial(id, campos) {
-    for (const propiedad in campos) {
-      const [result] = await connection.query(`UPDATE ciudades SET ${propiedad} = ? WHERE ciudad_id = ?`, [campos[propiedad], id]);
-    }
-    const [rows] = await connection.query("SELECT * FROM ciudades WHERE ciudad_id = ?", [id]);
-    return rows;
-  }
-
-  async validarCiudad(ciudad_id) {
-    const [rows] = await connection.query("SELECT * FROM usuarios WHERE id_ciudad = ?", [ciudad_id]);
-    return rows.length > 0;
   }
   async eliminar(id) {
-    try {
-      if (await this.validarCiudad(id)) {
-        throw new Error("no se puede eliminar la ciudad porque tiene usuarios asociados");
-      }
-      const [result] = await connection.query("DELETE FROM ciudades WHERE ciudad_id = ?", [id]);
-      return result;
-    } catch (error) {
-      throw new Error(error);
+    const [result] = await connection.query("DELETE FROM ciudades WHERE ciudad_id = ?", [id]);
+    if(result.affectedRows === 0){
+        return{
+          error: true,
+          message: "No se pudo eliminar la ciudad, ocurrio un error inesperado.",
+        }
+    }
+    return{
+      error: false,
+      message: "Ciudad eliminada exitosamente.",
     }
   }
 

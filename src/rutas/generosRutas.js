@@ -1,17 +1,19 @@
 import express from "express";
 import GenerosController from "../controller/GenerosController.js";
-import { validarGeneros } from "../middlewares/validarGeneros.js";
+import { camposGeneros, parcialesGeneros } from "../middlewares/generos/index.js";
 
 
 const router = express.Router();
 
 router.get('/', GenerosController.getAllGeneros);
 
-router.post('/', validarGeneros, GenerosController.createGeneros);
+router.get('/:id', GenerosController.getGeneroById);
 
-router.put('/:id', GenerosController.actualizarGeneros);
+router.post('/', camposGeneros, GenerosController.createGenero);
 
-router.patch('/:id', GenerosController.actualizarParcialGeneros);
+router.put('/:id', camposGeneros, GenerosController.actualizarGeneros);
+
+router.patch('/:id', parcialesGeneros,GenerosController.actualizarGeneros);
 
 router.delete('/:id', GenerosController.eliminarGeneros);
 

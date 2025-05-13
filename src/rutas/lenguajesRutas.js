@@ -1,17 +1,19 @@
 import express from "express";
 import LenguajesController from "../controller/LenguajesController.js";
-import { validarLenguajes } from "../middlewares/validarLenguajes.js";
+import { camposLenguajes, parcialesLenguajes } from "../middlewares/lenguajes/index.js";
 
 
 const router = express.Router();
 
 router.get('/', LenguajesController.getAllLenguajes);
 
-router.post('/', validarLenguajes, LenguajesController.createLenguajes);
+router.get('/:id', LenguajesController.getLenguajesById);
 
-router.put('/:id', LenguajesController.actualizarLenguajes);
+router.post('/', camposLenguajes, LenguajesController.createLenguajes);
 
-router.patch('/:id', LenguajesController.actualizarParcialLenguajes);
+router.put('/:id',camposLenguajes, LenguajesController.actualizarLenguajes);
+
+router.patch('/:id',parcialesLenguajes, LenguajesController.actualizarLenguajes);
 
 router.delete('/:id', LenguajesController.eliminarLenguajes);
 

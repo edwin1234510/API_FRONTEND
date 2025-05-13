@@ -10,9 +10,27 @@ class Generos {
       throw new Error("error al obtener los generos");
     }
   }
+  async getById(id) {
+    try {
+      const [rows] = await connection.query("SELECT * FROM generos WHERE genero_id = ?", [id]);
+      if (rows.length === 0) {
+        return []
+      }
+      return rows[0];
+    } catch (error) {
+      throw new Error("error al obtener los generos");
+    }
+  }
+  async usuarios(id) {
+    const [rows] = await connection.query("SELECT * FROM usuarios WHERE id_genero  = ?", [id]);
+    return rows;
+  }
   async create(genero) {
     try {
       const [result] = await connection.query("INSERT INTO generos (genero) VALUES (?)", [genero]);
+      if(result.affectedRows === 0){
+        return null;
+      }
       return {
         id: result.id, genero
       }
@@ -20,38 +38,35 @@ class Generos {
       throw new Error("error al crear el genero");
     }
   }
-  async update(genero, id) {
+  async update(id, campos) {
     try {
-      const [result] = await connection.query("UPDATE generos SET genero = ? WHERE genero_id = ?", [genero, id]);
-      if (result.affectedRows === 0) {
-        throw new Error("genero no encontrada");
+      let query = "UPDATE generos SET ";
+      let params = [];
+      for(const [key, value] of Object.entries(campos)){
+        query+= `${key} = ?, `;
+        params.push(value);
       }
-      return { id, genero }
+      query = query.slice(0, -2);
+      query += "WHERE genero_id = ? ";
+      params.push(id);
+      const [result] = await connection.query(query,params);
+      return result.affectedRows > 0? { id, ...campos}: null;
     } catch (error) {
-
+      throw new Error("Error al actualizar el genero");
     }
   }
-  async updateParcial(id,campos) {
-    for (const propiedad in campos) {
-      const [result] = await connection.query(`UPDATE generos SET ${propiedad} = ? WHERE genero_id = ?`, [campos[propiedad], id]);
-    }
-    const [rows] = await connection.query("SELECT * FROM generos WHERE genero_id = ?", [id]);
-    return rows;
-  }
 
-  async validarGenero (genero_id) {
-    const [rows] = await connection.query("SELECT * FROM usuarios WHERE id_genero = ?",[genero_id]);
-    return rows.length>0;
-  }
   async eliminar (id){
-    try {
-      if(await this.validarGenero(id)){
-        throw new Error("no se puede eliminar el genero porque tiene usuarios asociados");
-      }
-      const [result] = await connection.query("DELETE FROM generos WHERE genero_id = ?", [id]);
-      return result;
-    } catch (error) {
-      throw new Error(error);
+    const [result] = await connection.query("DELETE FROM generos WHERE genero_id = ?", [id]);
+    if(result.affectedRows === 0){
+        return{
+          error: true,
+          message: "No se pudo eliminar el genero, ocurrio un error inesperado.",
+        }
+    }
+    return{
+      error: false,
+      message: "Genero eliminada exitosamente.",
     }
   }
   

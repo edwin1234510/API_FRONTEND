@@ -75,34 +75,46 @@ class CiudadesController {
   }
   static actualizarCiudad = async (req, res) => {
     const { id } = req.params;
-    const { ciudad_nombre } = req.body;
-    try {
-      const OBJCiudad = new Ciudades();
-      const ciudades = await OBJCiudad.update(ciudad_nombre, id);
-      res.json(ciudades);
-    } catch (error) {
-      res.status(500).json({ error: error.message })
-    }
-  }
-  static actualizarParcialCiudad = async (req, res) => {
-    const { id } = req.params;
     const campos = req.body;
     try {
-      const OBJCiudad = new Ciudades();
-      const ciudades = await OBJCiudad.updateParcial(id, campos);
-      res.json(ciudades);
+      const ciudad = await CiudadesServicio.updateCiudaD(id,campos);
+      if(ciudad.error){
+        ResponseProvider.error(
+          res,
+          ciudad.message,
+          ciudad.code
+        );
+      }
+      ResponseProvider.success(
+        res,
+        ciudad.data,
+        ciudad.message,
+        ciudad.code
+      )
     } catch (error) {
-      res.status(500).json({ error: error.message })
+      ResponseProvider.error(res, "Error al interno en el servidor", 500);
     }
   }
   static eliminarCiudad = async (req, res) => {
     const { id } = req.params;
     try {
-      const OBJCiudad = new Ciudades();
-      const ciudades = await OBJCiudad.eliminar(id);
-      res.status(200).json(ciudades);
+      const response = await CiudadesServicio.deleteCiudaD(id);
+      if(response.error){
+        ResponseProvider.error(
+          res,
+          response.message,
+          response.code
+        );
+      }else{
+        ResponseProvider.success(
+          res,
+          response.data,
+          response.message,
+          response.code
+        );
+      }
     } catch (error) {
-      res.status(500).json({ error: error.message })
+      ResponseProvider.error(res, "Error al interno en el servidor", 500);
     }
 
   }

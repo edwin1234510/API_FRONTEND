@@ -1,55 +1,116 @@
-import Lenguajes from "../models/Lenguajes.js";
-
+import { ResponseProvider } from "../providers/ResponseProvider.js";
+import LenguajesServicio from "../service/servicioLenguaje.js";
 
 
 class LenguajesController {
   static getAllLenguajes = async (req, res) => {
-    const OBJLenguajes = new Lenguajes();
-    const lenguajes = await OBJLenguajes.getAll();
-    res.json(lenguajes);
+    try {
+      const response = await LenguajesServicio.getLenguajes();
+      if (response.error) {
+        return ResponseProvider.error(
+          res,
+          response.message,
+          response.code
+        );
+      } else {
+        return ResponseProvider.success(
+          res,
+          response.data,
+          response.message,
+          response.code,
+        );
+      }
+    } catch (error) {
+      ResponseProvider.error(res, "Error al interno del servidor", 500);
+    }
+  }
+  static getLenguajesById = async (req, res) => {
+    const { id } = req.params;
+    try {
+      const response = await LenguajesServicio.getLenguajeSById(id);
+      if (response.error) {
+        return ResponseProvider.error(
+          res,
+          response.message,
+          response.code,
+        );
+      } else {
+        return ResponseProvider.success(
+          res,
+          response.data,
+          response.message,
+          response.code
+        );
+      }
+    } catch (error) {
+      ResponseProvider.error(res, "Error al interno del servidor", 500);
+    }
   }
   static createLenguajes = async (req, res) => {
+    const { lenguaje } = req.body;
     try {
-      const { lenguaje } = req.body;
-      const OBJLenguajes = new Lenguajes();
-      const lenguajess = await OBJLenguajes.create(lenguaje);
-      res.status(201).json(lenguajess);
+      const response = LenguajesServicio.createLenguajeS(lenguaje);
+      if (response.error) {
+        return ResponseProvider.error (
+          res,
+          response.message,
+          response.code,
+        );
+      } else {
+        return ResponseProvider.success(
+          res,
+          response.data,
+          response.message,
+          response.code
+        );
+      }
     } catch (error) {
-      res.status(500).json({ error: error.message })
+      ResponseProvider.error(res, "Error al interno del servidor", 500);
     }
   }
   static actualizarLenguajes = async (req, res) => {
     const { id } = req.params;
-    const { lenguaje } = req.body;
-    try {
-      const OBJLenguajes = new Lenguajes();
-      const lenguajess = await OBJLenguajes.update(lenguaje, id);
-      res.json(lenguajess);
-    } catch (error) {
-      res.status(500).json({ error: error.message })
-    }
-  }
-  static actualizarParcialLenguajes= async (req, res) => {
-    const {id} = req.params;
     const campos = req.body;
     try {
-      const OBJLenguajes = new Lenguajes();
-      const lenguajess = await OBJLenguajes.updateParcial(id,campos);
-      res.json(lenguajess);
+      const lenguaje = await LenguajesServicio.updateLenguajeS(id,campos);
+      if(lenguaje.error){
+        ResponseProvider.error(
+          res,
+          lenguaje.message,
+          lenguaje.code
+        );
+      }
+      ResponseProvider.success(
+        res,
+        lenguaje.data,
+        lenguaje.message,
+        lenguaje.code
+      )
     } catch (error) {
-      res.status(500).json({ error: error.message })
+      ResponseProvider.error(res, "Error al interno en el servidor", 500);
     }
   }
   static eliminarLenguajes = async (req, res)=>{
-    const {id} = req.params;
+    const { id } = req.params;
     try {
-      const OBJLenguajes = new Lenguajes();
-      const lenguajess = await OBJLenguajes.eliminar(id);
-      res.status(200).json(lenguajess);
+      const response = await LenguajesServicio.deleteLenguajes(id);
+      if(response.error){
+        ResponseProvider.error(
+          res,
+          response.message,
+          response.code
+        );
+      }else{
+        ResponseProvider.success(
+          res,
+          response.data,
+          response.message,
+          response.code
+        );
+      }
     } catch (error) {
-      res.status(500).json({ error: error.message })
+      ResponseProvider.error(res, "Error al interno en el servidor", 500);
     }
-    
   }
 }
 
