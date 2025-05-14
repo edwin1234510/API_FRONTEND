@@ -2,15 +2,6 @@ import connection from "../utils/db.js";
 
 
 class Usuarios {
-  constructor(documento,nombre, apellido, telefono, contrasena, id_genero, id_ciudad) {
-    this.documento = documento;
-    this.nombre = nombre;
-    this.apellido = apellido;
-    this.telefono = telefono;
-    this.contrasena = contrasena;
-    this.id_genero = id_genero;
-    this.id_ciudad = id_ciudad;
-  }
   async getAll() {
     try {
       const [rows] = await connection.query("SELECT * FROM usuarios");
@@ -19,47 +10,60 @@ class Usuarios {
       throw new Error("error al obtener los usuarios");
     }
   }
-  async validarUsuarioDocumento (documento) {
-    const [rows] = await connection.query("SELECT * FROM usuarios WHERE documento = ?",[documento]);
-    return rows.length>0;
+  async getById(id) {
+    try {
+      const [rows] = await connection.query("SELECT * FROM usuarios WHERE usuario_id = ?", [id]);
+      if (rows.length === 0) {
+        return []
+      }
+      return rows[0];
+    } catch (error) {
+      throw new Error("error al obtener el usuario");
+    }
+  }
+  async LenguajeUsuarios(id) {
+    const [rows] = await connection.query("SELECT * FROM lenguajes_usuarios WHERE id_usuario  = ?", [id]);
+    return rows;
   }
   async create(documento,nombre, apellido, telefono, contrasena, id_genero, id_ciudad) {
     try {
-      if(await this.validarUsuarioDocumento(documento)){
-        throw new Error("El usuario ya existente en la base de datos");
-      }
       const [result] = await connection.query("INSERT INTO usuarios (documento,nombre,apellido,telefono,contrasena,id_genero,id_ciudad) VALUES (?,?,?,?,?,?,?)", [documento,nombre, apellido, telefono, contrasena, id_genero, id_ciudad]);
-      return {id: result.usuario_id, documento,nombre, apellido, telefono, contrasena, id_genero, id_ciudad}
+      if(result.affectedRows === 0){
+        return null;
+      }
+      return {id: result.id, documento,nombre, apellido, telefono, contrasena, id_genero, id_ciudad}
     } catch (error) {
-      throw new Error(error);
+        throw new Error("error al crear el usuario");
     }
   }
-  async update(documento, nombre, apellido, telefono, contrasena, id_genero, id_ciudad,id ) {
+  async update(id,campos ) {
     try {
-      const [result] = await connection.query("UPDATE usuarios SET documento = ?, nombre = ?,apellido = ?,telefono = ?,contrasena = ?, id_genero = ?,id_ciudad = ? WHERE usuario_id = ?", [documento,nombre, apellido, telefono, contrasena, id_genero, id_ciudad,id]);
-      if (result.affectedRows === 0) {
-        throw new Error("Usuario no encontrada");
+      let query = "UPDATE usuarios SET ";
+      let params = [];
+      for(const [key, value] of Object.entries(campos)){
+        query+= `${key} = ?, `;
+        params.push(value);
       }
-      return { documento, nombre, apellido, telefono, contrasena, id_genero, id_ciudad,id }
+      query = query.slice(0, -2);
+      query += "WHERE usuario_id = ? ";
+      params.push(id);
+      const [result] = await connection.query(query,params);
+      return result.affectedRows > 0? { id, ...campos}: null;
     } catch (error) {
-      console.log(error);
       throw new Error("Error al actualizar el usuario");
     }
   }
- async updateParcial(id,campos) {
-    for (const propiedad in campos) {
-      const [result] = await connection.query(`UPDATE usuarios SET ${propiedad} = ? WHERE usuario_id = ?`, [campos[propiedad], id]);
-    }
-    const [rows] = await connection.query("SELECT * FROM usuarios WHERE usuario_id = ?", [id]);
-    return rows;
-  }
-  
   async eliminar (id){
-    try {
-      const [result] = await connection.query("DELETE FROM usuarios WHERE usuario_id = ?", [id]);
-      return result;
-    } catch (error) {
-      throw new Error("error al eliminar el usuario");
+    const [result] = await connection.query("DELETE FROM usuarios WHERE usuario_id = ?", [id]);
+    if(result.affectedRows === 0){
+        return{
+          error: true,
+          message: "No se pudo eliminar el usuario, ocurrio un error inesperado.",
+        }
+    }
+    return{
+      error: false,
+      message: "Usuario eliminada exitosamente.",
     }
   }
 }

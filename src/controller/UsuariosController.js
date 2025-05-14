@@ -1,52 +1,115 @@
-import Usuarios from "../models/Usuarios.js";
+import { ResponseProvider } from "../providers/ResponseProvider.js";
+import UsuariosServicio from "../service/servicioUsuarios.js";
 
 
 class UsuariosController {
   static getAllUsuarios = async (req, res) => {
-    const OBJUsuarios = new Usuarios();
-    const usuarios = await OBJUsuarios.getAll();
-    res.json(usuarios);
+    try {
+      const response = await UsuariosServicio.getUsuarios();
+      if (response.error) {
+        return ResponseProvider.error(
+          res,
+          response.message,
+          response.code
+        );
+      } else {
+        return ResponseProvider.success(
+          res,
+          response.data,
+          response.message,
+          response.code,
+        );
+      }
+    } catch (error) {
+      ResponseProvider.error(res, "Error al interno del servidor", 500);
+    }
+  }
+  static getLenguajesById = async (req, res) => {
+    const { id } = req.params;
+    try {
+      const response = await UsuariosServicio.getUsuarioSById(id);
+      if (response.error) {
+        return ResponseProvider.error(
+          res,
+          response.message,
+          response.code,
+        );
+      } else {
+        return ResponseProvider.success(
+          res,
+          response.data,
+          response.message,
+          response.code
+        );
+      }
+    } catch (error) {
+      ResponseProvider.error(res, "Error al interno del servidor", 500);
+    }
   }
   static createUsuarios = async (req, res) => {
+    const { documento,nombre, apellido, telefono, contrasena, id_genero, id_ciudad} = req.body;
     try {
-      const { documento,nombre, apellido, telefono, contrasena, id_genero, id_ciudad} = req.body;
-      const OBJUsuarios = new Usuarios();
-      const usuarios = await OBJUsuarios.create(documento,nombre, apellido, telefono, contrasena, id_genero, id_ciudad);
-      res.status(201).json(usuarios);
+      const response = UsuariosServicio.createUsuarioS(documento,nombre, apellido, telefono, contrasena, id_genero, id_ciudad);
+      if (response.error) {
+        return ResponseProvider.error (
+          res,
+          response.message,
+          response.code,
+        );
+      } else {
+        return ResponseProvider.success(
+          res,
+          response.data,
+          response.message,
+          response.code
+        );
+      }
     } catch (error) {
-      res.status(500).json({ error: error.message })
+      ResponseProvider.error(res, "Error al interno del servidor", 500);
     }
   }
   static actualizarUsuarios= async (req, res) => {
     const { id } = req.params;
-    const { documento, nombre, apellido, telefono, contrasena, id_genero, id_ciudad } = req.body;
-    try {
-      const OBJUsuarios = new Usuarios();
-      const usuarios = await OBJUsuarios.update(documento,nombre, apellido, telefono, contrasena, id_genero, id_ciudad, id);
-      res.json(usuarios);
-    } catch (error) {
-      res.status(500).json({ error: error.message })
-    }
-  }
-  static actualizarParcialUsuarios = async (req, res) => {
-    const {id} = req.params;
     const campos = req.body;
     try {
-      const OBJUsuarios = new Usuarios();
-      const usuarios = await OBJUsuarios.updateParcial(id,campos);
-      res.json(usuarios);
+      const lenguaje = await UsuariosServicio.updateUsuarioS(id,campos);
+      if(lenguaje.error){
+        ResponseProvider.error(
+          res,
+          lenguaje.message,
+          lenguaje.code
+        );
+      }
+      ResponseProvider.success(
+        res,
+        lenguaje.data,
+        lenguaje.message,
+        lenguaje.code
+      )
     } catch (error) {
-      res.status(500).json({ error: error.message })
+      ResponseProvider.error(res, "Error al interno en el servidor", 500);
     }
   }
   static eliminarUsuarios = async (req, res)=>{
     const {id} = req.params;
     try {
-      const OBJUsuarios= new Usuarios();
-      const usuarios = await OBJUsuarios.eliminar(id);
-      res.json(usuarios);
+      const response = await UsuariosServicio.deleteUsuarioS(id);
+      if(response.error){
+        ResponseProvider.error(
+          res,
+          response.message,
+          response.code
+        );
+      }else{
+        ResponseProvider.success(
+          res,
+          response.data,
+          response.message,
+          response.code
+        );
+      }
     } catch (error) {
-      res.status(500).json({ error: error.message })
+      ResponseProvider.error(res, "Error al interno en el servidor", 500);
     }
   }
 }

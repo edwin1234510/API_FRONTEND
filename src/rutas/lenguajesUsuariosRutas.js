@@ -1,6 +1,6 @@
 import express from "express";
 import LenguajesUsuariosController from "../controller/LenguajesUsuariosController.js";
-import { validarLenguajesUsuarios } from "../middlewares/validarLenguajesUsuarios.js";
+import {parcialesUsuariosLen,camposUsuariosLen } from "../middlewares/lenguajesUsuarios/index.js";
 
 
 
@@ -8,11 +8,13 @@ const router = express.Router();
 
 router.get('/', LenguajesUsuariosController.getAllLenguajeUsuarios);
 
-router.post('/', validarLenguajesUsuarios, LenguajesUsuariosController.createLenguajeUsuarios);
+router.get('/:id', LenguajesUsuariosController.getLenguajesById);
 
-router.put('/:id', LenguajesUsuariosController.actualizarLenguajeUsuarios);
+router.post('/', camposUsuariosLen, LenguajesUsuariosController.createLenguajeUsuarios);
 
-router.patch('/:id', LenguajesUsuariosController.actualizarParcialLenguajeUsuarios);
+router.put('/:id',camposUsuariosLen, LenguajesUsuariosController.actualizarLenguajeUsuarios);
+
+router.patch('/:id',parcialesUsuariosLen, LenguajesUsuariosController.actualizarLenguajeUsuarios);
 
 router.delete('/:id', LenguajesUsuariosController.eliminarLenguajeUsuarios);
 

@@ -1,17 +1,19 @@
 import express from "express";
 import UsuariosController from "../controller/UsuariosController.js";
-import { validarUsuarios } from "../middlewares/validarUsuarios.js";
+import { camposUsuarios,parcialesUsuarios } from "../middlewares/usuarios/index.js";
 
 
 const router = express.Router();
 
 router.get('/', UsuariosController.getAllUsuarios);
 
-router.post('/', validarUsuarios,UsuariosController.createUsuarios);
+router.get('/:id', UsuariosController.getLenguajesById);
 
-router.put('/:id', UsuariosController.actualizarUsuarios);
+router.post('/',camposUsuarios,UsuariosController.createUsuarios);
 
-router.patch('/:id', UsuariosController.actualizarParcialUsuarios);
+router.put('/:id', camposUsuarios,UsuariosController.actualizarUsuarios);
+
+router.patch('/:id',parcialesUsuarios, UsuariosController.actualizarUsuarios);
 
 router.delete('/:id', UsuariosController.eliminarUsuarios);
 
