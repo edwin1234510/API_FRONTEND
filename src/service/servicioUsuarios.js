@@ -30,28 +30,30 @@ class UsuariosServicio {
   static async getUsuarioSById(id) {
     try {
       const UsuariosInstancia = new Usuarios();
-      const usuarios = await UsuariosInstancia.getById(id);
-      if (usuarios.length === 0) {
+      const usuario = await UsuariosInstancia.getById(id);
+      if (!usuario) {
         return {
           error: true,
           code: 404,
-          message: "Usuarios no encontrada",
-        }
+          message: "Usuario no encontrado",
+        };
       }
-      const IdUsuarios = await UsuariosInstancia.LenguajeUsuarios(id);
-      usuarios.Lenguaje_Usuario = IdUsuarios;
+      const genero = await UsuariosInstancia.getGeneroById(usuario.id_genero);
+      const ciudad = await UsuariosInstancia.getCiudadById(usuario.id_ciudad);
+      usuario.genero = genero;
+      usuario.ciudad = ciudad;
       return {
         error: false,
         code: 200,
-        message: "Usuarios obtenida correctamento",
-        data: usuarios
-      }
+        message: "Usuario obtenido correctamente",
+        data: usuario,
+      };
     } catch (error) {
       return {
         error: true,
         code: 500,
         message: "Error al obtener el usuario",
-      }
+      };
     }
   }
   static async createUsuarioS(documento,nombre, apellido, telefono, contrasena, id_genero, id_ciudad) {

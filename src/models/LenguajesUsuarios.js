@@ -13,19 +13,34 @@ class LenguajeUsuarios {
   }
   async getById(id) {
     try {
-      const [rows] = await connection.query("SELECT * FROM lenguajes_usuarios WHERE id = ?", [id]);
+      const [rows] = await connection.query(
+        "SELECT * FROM lenguajes_usuarios WHERE id = ?", 
+        [id]
+      );
       if (rows.length === 0) {
-        return []
+        return [];
       }
       return rows[0];
     } catch (error) {
       throw new Error("error al obtener el lenguaje usuario");
     }
   }
-  /*async LenguajeUsuariosID(id) {
-    const [rows] = await connection.query("SELECT * FROM lenguajes_usuarios WHERE id  = ?", [id]);
-    return rows;
-  }*/
+  
+  async getUsuarioById(id_usuario) {
+    const [rows] = await connection.query(
+      "SELECT * FROM usuarios WHERE usuario_id = ?", 
+      [id_usuario]
+    );
+    return rows[0];
+  }
+  
+  async getLenguajeById(id_lenguaje) {
+    const [rows] = await connection.query(
+      "SELECT * FROM lenguajes WHERE lenguaje_id = ?", 
+      [id_lenguaje]
+    );
+    return rows[0];
+  }
   async create(id_usuario,id_lenguaje) {
     try {
       const [result] = await connection.query("INSERT INTO lenguajes_usuarios (id_usuario,id_lenguaje) VALUES (?,?)", [id_usuario,id_lenguaje]);

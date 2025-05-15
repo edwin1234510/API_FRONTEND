@@ -30,29 +30,35 @@ class LenguajeUsuariosServicio {
   }
   static async getLenguajeUsuariosById(id) {
     try {
-      const LenguajeUsuariosInstancia = new LenguajeUsuarios();
-      const lenguajeUsuarios = await LenguajeUsuariosInstancia.getById(id);
-      if (lenguajeUsuarios.length === 0) {
+      const instancia = new LenguajeUsuarios();
+      const relacion = await instancia.getById(id);
+      if (!relacion || relacion.length === 0) {
         return {
           error: true,
           code: 404,
-          message: "lenguaje usuarios no encontrada",
-        }
+          message: "Lenguaje usuario no encontrado",
+        };
       }
-      //const IdlenguajeUsuarios = await LenguajeUsuariosInstancia.LenguajeUsuariosID(id);
-      //lenguajeUsuarios.Lenguaje_Usuario = IdlenguajeUsuarios;
+      const { id_usuario, id_lenguaje } = relacion;
+  
+      const usuario = await instancia.getUsuarioById(id_usuario);
+      const lenguaje = await instancia.getLenguajeById(id_lenguaje);
+  
+      relacion.usuario = usuario;
+      relacion.lenguaje = lenguaje;
+  
       return {
         error: false,
         code: 200,
-        message: "lenguaje usuarios obtenida correctamento",
-        data: lenguajeUsuarios
-      }
+        message: "Lenguaje usuario obtenido correctamente",
+        data: relacion,
+      };
     } catch (error) {
       return {
         error: true,
         code: 500,
-        message: "Error al obtener el lenguaje usuarios",
-      }
+        message: "Error al obtener el lenguaje usuario",
+      };
     }
   }
   static async createLenguajeUsuarioS(id_usuario,id_lenguaje) {

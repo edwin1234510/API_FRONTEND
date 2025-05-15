@@ -21,9 +21,20 @@ class Usuarios {
       throw new Error("error al obtener el usuario");
     }
   }
-  async LenguajeUsuarios(id) {
-    const [rows] = await connection.query("SELECT * FROM lenguajes_usuarios WHERE id_usuario  = ?", [id]);
-    return rows;
+  async getGeneroById(id_genero) {
+    const [rows] = await connection.query(
+      "SELECT * FROM generos WHERE genero_id = ?", 
+      [id_genero]
+    );
+    return rows[0];
+  }
+  
+  async getCiudadById(id_ciudad) {
+    const [rows] = await connection.query(
+      "SELECT * FROM ciudades WHERE ciudad_id = ?", 
+      [id_ciudad]
+    );
+    return rows[0];
   }
   async create(documento,nombre, apellido, telefono, contrasena, id_genero, id_ciudad) {
     try {
