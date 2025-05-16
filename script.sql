@@ -2,25 +2,25 @@ use validacion;
 
 create table generos(
 genero_id int auto_increment,
-genero varchar(100) not null,
+genero varchar(50) not null,
 primary key(genero_id));
 
 create table ciudades(
 ciudad_id int auto_increment,
-ciudad_nombre varchar(150) not null,
+ciudad_nombre varchar(50) not null,
 primary key(ciudad_id));
 
 create table lenguajes(
 lenguaje_id int auto_increment primary key,
-lenguaje varchar(150));
+lenguaje varchar(50));
 
 create table usuarios(
 usuario_id int auto_increment primary key,
 documento int unique,
-nombre varchar(255) not null,
-apellido varchar(255) not null,
+nombre varchar(50) not null,
+apellido varchar(50) not null,
 telefono bigint,
-contrasena varchar(255) not null,
+contrasena varchar(100) not null,
 id_genero INT,
 id_ciudad int,
 FOREIGN KEY (id_genero) REFERENCES generos(genero_id)on delete set null,
