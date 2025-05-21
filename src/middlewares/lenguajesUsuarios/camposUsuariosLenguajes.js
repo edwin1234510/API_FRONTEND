@@ -11,7 +11,7 @@ export function camposUsuariosLen(req, res,next){
             maxLength,
         } = campo
         const value = req.body[name];
-        if(required && (!value || value.trim() === "")){
+        if(required && (typeof value !== "string" || value.trim() === "")){
             errors.push({
                 campo: name,
                 message: `el campo ${name} es obligatorio y no puede estar vacio`,
@@ -25,7 +25,6 @@ export function camposUsuariosLen(req, res,next){
             });
             continue;
           }
-          // Validar el tamaño máximo del campo
           if (maxLength && value && value.length > maxLength) {
             errors.push({
               campo: name,
