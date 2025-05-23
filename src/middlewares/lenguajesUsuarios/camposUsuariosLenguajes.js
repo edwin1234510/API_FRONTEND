@@ -11,7 +11,7 @@ export function camposUsuariosLen(req, res,next){
             maxLength,
         } = campo
         const value = req.body[name];
-        if(required && (typeof value !== "string" || value.trim() === "")){
+        if(required && !value){
             errors.push({
                 campo: name,
                 message: `el campo ${name} es obligatorio y no puede estar vacio`,
