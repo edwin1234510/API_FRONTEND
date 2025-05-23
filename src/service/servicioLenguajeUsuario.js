@@ -32,6 +32,9 @@ class LenguajeUsuariosServicio {
     try {
       const instancia = new LenguajeUsuarios();
       const relacion = await instancia.getById(id);
+
+
+
       if (!relacion || relacion.length === 0) {
         return {
           error: true,
@@ -40,13 +43,13 @@ class LenguajeUsuariosServicio {
         };
       }
       const { id_usuario, id_lenguaje } = relacion;
-  
+
       const usuario = await instancia.getUsuarioById(id_usuario);
       const lenguaje = await instancia.getLenguajeById(id_lenguaje);
-  
+
       relacion.usuario = usuario;
       relacion.lenguaje = lenguaje;
-  
+
       return {
         error: false,
         code: 200,
@@ -61,10 +64,10 @@ class LenguajeUsuariosServicio {
       };
     }
   }
-  static async createLenguajeUsuarioS(id_usuario,id_lenguaje) {
+  static async createLenguajeUsuarioS(id_usuario, id_lenguaje) {
     try {
       const LenguajeUsuariosInstancia = new LenguajeUsuarios();
-      const lenguajeUsuarios = await LenguajeUsuariosInstancia.create(id_usuario,id_lenguaje);
+      const lenguajeUsuarios = await LenguajeUsuariosInstancia.create(id_usuario, id_lenguaje);
       if (lenguajeUsuarios === null) {
         return {
           error: true,
@@ -90,14 +93,14 @@ class LenguajeUsuariosServicio {
     try {
       const LenguajeUsuariosInstancia = new LenguajeUsuarios();
       const LenguajeUsuariosExis = await LenguajeUsuariosInstancia.getById(id);
-      if(LenguajeUsuariosExis.length === 0){
-        return{
+      if (LenguajeUsuariosExis.length === 0) {
+        return {
           error: true,
           code: 404,
           message: "Lenguaje usuario no encontrada",
         }
       }
-      const lenguajeUsuarios = await LenguajeUsuariosInstancia.update(id,campos);
+      const lenguajeUsuarios = await LenguajeUsuariosInstancia.update(id, campos);
       if (lenguajeUsuarios === null) {
         return {
           error: true,
@@ -119,20 +122,20 @@ class LenguajeUsuariosServicio {
       }
     }
   }
-  static async deleteLenguajeUsuarioS(id){
+  static async deleteLenguajeUsuarioS(id) {
     try {
       const LenguajeUsuariosInstancia = new LenguajeUsuarios();
       const LenguajeUsuariosExis = await LenguajeUsuariosInstancia.getById(id);
-      if(LenguajeUsuariosExis.length === 0){
-        return{
+      if (LenguajeUsuariosExis.length === 0) {
+        return {
           error: true,
           code: 404,
           message: "Lenguaje usuario no encontrada",
         }
       }
       const rta = await LenguajeUsuariosInstancia.eliminar(id);
-      if(rta.error){
-        return{
+      if (rta.error) {
+        return {
           error: true,
           code: 400,
           message: rta.mensaje,
